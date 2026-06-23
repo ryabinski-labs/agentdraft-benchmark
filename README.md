@@ -1,14 +1,19 @@
 # AgentDraft collision benchmark
 
-A re-runnable measurement of [AgentDraft](https://agentdraft.io)'s conflict
-engine under multi-agent contention. It fires N AI scheduling agents at the
-**same calendar slot at the same instant** and records what the engine does.
+**The problem:** point two or more AI agents at one calendar and they
+double-book each other — they don't share a coordination layer. AgentDraft's
+conflict engine is supposed to resolve every such collision to exactly one
+winner. This is a re-runnable measurement of whether it actually does, under
+multi-agent contention. It fires N AI scheduling agents at the **same calendar
+slot at the same instant** and records what the engine does.
 This is the open harness behind the headline claim on agentdraft.io:
 
 > **0 double-bookings across 500 concurrent agent attempts · 100% resolution
 > accuracy · p99 commit 112 ms.**
 
-Don't trust the number — re-run it yourself.
+Don't trust the number — re-run it yourself. **The outcome:** in minutes you get
+your own signed-off report (JSON + Markdown) showing whether the engine really
+resolves every collision to exactly one winner, with no double-bookings.
 
 ## At a glance
 
@@ -31,7 +36,16 @@ Don't trust the number — re-run it yourself.
 - **Failure modes** — rounds with a double-commit, rounds with no winner, and
   outright errors. Each should be **0**.
 
-## Run it against the hosted API (recommended)
+## When to use this
+
+- **Use it** to independently verify AgentDraft's collision/latency claims, to
+  compare agent stacks (label each run), or to regression-test your own
+  AgentDraft deployment under contention.
+- **Not for you** if you want a general-purpose HTTP load tester (use k6/Locust)
+  or a unit test of the engine internals — this is a black-box client that
+  measures a *running* AgentDraft service, not the source.
+
+## Quickstart (hosted API, recommended)
 
 ```bash
 pip install -r requirements.txt
@@ -98,6 +112,24 @@ This runs many rounds silently, aggregates statistics, and writes files. The
 underlying race — every agent fires `POST /v1/bookings` at one slot
 concurrently — is identical each round; only the quantity and output shape
 differ.
+
+## Development
+
+```bash
+pip install -r requirements.txt pytest
+python -m py_compile run.py
+python -m pytest -q          # offline smoke tests, no network needed
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow.
+
+## Support
+
+- Questions, bugs, or reproductions that diverge from the published numbers:
+  open a [GitHub issue](https://github.com/ryabinski-labs/agentdraft-benchmark/issues).
+- AgentDraft product help: **hello@agentdraft.io**.
+- This is a community benchmark maintained on a best-effort basis (see
+  [MAINTAINERS.md](MAINTAINERS.md)); it is not a supported product surface.
 
 ## Links
 
