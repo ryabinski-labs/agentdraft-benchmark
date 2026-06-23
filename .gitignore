@@ -1,0 +1,9 @@
+# Benchmark output
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
